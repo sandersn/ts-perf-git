@@ -1,22 +1,27 @@
 import sh = require('shelljs')
 import fs = require('fs')
-const overwrite = false // TODO parse this from the command line
+import argparse = require('argparse')
+const parser = new argparse.ArgumentParser()
+parser.addArgument(['-o', '--overwrite'], { action: 'storeTrue' })
+const overwrite = parser.parseArgs()['overwrite'] || false
 function runPerf(commit: string) {
     const filename = commit + '.benchmark'
     if (sh.test('-e', filename) && !overwrite) {
         return
     }
-    sh.test('', commit + '.benchmark')
     sh.pushd('~/TypeScript')
     sh.exec('git checkout ' + commit)
     sh.exec('jake clean')
-    sh.exec('jake')
-    sh.cd('~/TypeScript/internal/scripts/perf/bin')
-    sh.exec('./ts-perf benchmark --iterations 10 --save ~/src/perf2.7/' + filename)
+    sh.exec('jake tsc')
+    sh.exec('node internal/scripts/perf/out/ts-perf-cli/cli.js benchmark --iterations 10 --save ~/src/perf2.7/' + filename)
     sh.popd()
 }
 function loadCommits(path: string) {
-    for (const commit of fs.readFileSync(path, 'utf8').split('\n')) {
+    const commits = fs.readFileSync(path, 'utf8').split('\n')
+    let i = 0
+    for (const commit of commits) {
+        i++
+        console.log(`----------------------------- ${commit} (${i}/${commits.length}) ----------------------------`)
         runPerf(commit)
     }
 }
