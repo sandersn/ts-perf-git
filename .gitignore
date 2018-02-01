@@ -1,1 +1,3 @@
 *.benchmark
+*.js
+node_modules/
