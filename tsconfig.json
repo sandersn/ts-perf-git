@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "strict": true
+        "strict": true,
+        "target": "es2016",
+        "module": "commonjs"
     },
     "files": [
         "perf.ts"
