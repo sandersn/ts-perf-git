@@ -4,9 +4,10 @@ import argparse = require('argparse')
 
 const parser = new argparse.ArgumentParser()
 parser.addArgument(['-o', '--overwrite'], { action: 'storeTrue' })
-parser.addArgument(['--scenario'], { action: 'store' })
-parser.addArgument(['--pass'], { action: 'store' })
-parser.addArgument(['--commit'], { action: 'store' })
+parser.addArgument(['--scenario'])
+parser.addArgument(['--pass'])
+parser.addArgument(['--commit'])
+parser.addArgument(['--source'])
 const scenarioMap: { [s: string]: number } = {
     Angular: 0,
     Compiler: 1,
@@ -15,12 +16,11 @@ const scenarioMap: { [s: string]: number } = {
     TFS: 4
 }
 const args = parser.parseArgs()
-const overwrite = args['overwrite'] || false
 
 // const progress = new ProgressBar(process.stderr, { clear: true });
 // const logger = new Logger(LogLevel.Verbose, { out: process.stdout, err: process.stderr, progress });
 // const host = new HostContext(logger);
-function runPerf(commit: string) {
+function runPerf(commit: string, overwrite: boolean) {
     const filename = commit + '.benchmark'
     if (sh.test('-e', filename) && !overwrite) {
         return
@@ -33,17 +33,21 @@ function runPerf(commit: string) {
     // await perf.benchmark({ iterations: 10, save: [commit + ".benchmark"], tsc: '~/TypeScript/built/local/tsc.js', suite: "~/TypeScript/internal/cases/perf/solutions" }, host)
     sh.exec('node ~/TypeScript/internal/scripts/perf/bin/ts-perf benchmark --iterations 10 --save ~/src/perf2.7/' + filename)
 }
-function loadCommits(path: string) {
-    const commits = fs.readFileSync(path, 'utf8').split('\n')
+function readCommits(path: string) {
+    const lines = fs.readFileSync(path, 'utf8').split('\n')
+    return lines.slice(0, lines.length - 1).map(line => line.match(/([0-9a-f]+) /)![1])
+}
+function loadCommits(path: string, overwrite: boolean) {
     let i = 0
+    const commits = readCommits(path)
     for (const commit of commits) {
         i++
         console.log(`----------------------------- ${commit} (${i}/${commits.length}) ----------------------------`)
-        runPerf(commit)
+        runPerf(commit, overwrite)
     }
 }
 function diffCommits(path: string) {
-    const commits = fs.readFileSync(path, 'utf8').split('\n')
+    const commits = readCommits(path)
     const baseline = JSON.parse(fs.readFileSync(commits[0] + '.benchmark', 'utf8')) as Benchmark
     const scenario = args['scenario'] ? scenarioMap[args['scenario']] : 0
     const pass = args['pass'] && args['pass'] === 'check' ? 'checkTime' : 'emitTime'
@@ -73,12 +77,14 @@ function diffPerf(baseline: Benchmark, scenario: number, pass: 'checkTime' | 'em
     // const b: Benchmark = await perf.Benchmark.loadAsync(baseline + '.benchmark', host)
     // sh.exec(`node ~/TypeScript/internal/scripts/perf/bin/ts-perf benchmark --load ${commit}.benchmark --baseline ${baseline}.benchmark`)
 }
+
+const source = args['source'] || './merge-commits.txt'
 if (args['scenario'] || args['pass']) {
-    diffCommits('./merge-commits.txt')
+    diffCommits(source)
 }
 else if (args['commit']) {
-    runPerf(args['commit'])
+    runPerf(args['commit'], args['overwrite'])
 }
 else {
-    loadCommits('./merge-commits.txt')
+    loadCommits(source, args['overwrite'])
 }

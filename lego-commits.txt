@@ -1,0 +1,4 @@
+0ece9e29c17d10f8cea011d7d5eb33f2ff2d5971 LEGO: Merge pull request 20554 Thu Dec 7 15:10:40 2017 -0800
+158970497e879f7d3bfd84078fb10042f7a024e7 LEGO: check in for master to temporary branch. Thu Dec 7 23:10:20 2017 +0000
+5e5b7706e55e3f416c0ee7bad0cdb1ecf5342b3f Hack to allow concat to work even when an Array isn't assignable to ReadonlyArray (#20455) Thu Dec 7 12:15:12 2017 -0800
+19ea189b429e426bff88753249745f4292b04343 Support a "getCombinedCodeFix" service (#20338) Thu Dec 7 12:14:18 2017 -0800

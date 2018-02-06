@@ -1,0 +1,4 @@
+ff4f03c51d2598317800325074e8062a2eb3c763 Merge pull request #20882 from Microsoft/fixNarrowTypeBySwitch Thu Dec 28 09:22:26 2017 -0800
+d1befefab9732301ab17ba011af4f7a00e76b536 Accept new baselines Sat Dec 23 19:28:20 2017 -0800
+319ad71b159fe9bab4056dc65a9a67a9b25d0742 Add regression test Sat Dec 23 19:28:13 2017 -0800
+5d3ecaebadf7904825e7b9286ef03cf26a998a26 Fix narrowTypeBySwitchOnDiscriminant function Sat Dec 23 19:12:49 2017 -0800
